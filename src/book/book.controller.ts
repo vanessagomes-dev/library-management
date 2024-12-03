@@ -10,6 +10,8 @@ import {
 import { BookService } from './book.service';
 import { Book } from './book.entity';
 import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
+import { NotFoundException } from '@nestjs/common';
 
 @Controller('book')
 export class BookController {
@@ -27,15 +29,23 @@ export class BookController {
 
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Book> {
-    return this.bookService.findOne(id);
+    const book = await this.bookService.findOne(id);
+    if (!book) {
+      throw new NotFoundException(`Book with id ${id} not found`);
+    }
+    return book;
   }
 
   @Put(':id')
   async update(
     @Param('id') id: number,
-    @Body() updateBookDto: CreateBookDto,
+    @Body() updateBookDto: UpdateBookDto,
   ): Promise<Book> {
-    return this.bookService.update(id, updateBookDto);
+    const book = await this.bookService.update(id, updateBookDto);
+    if (!book) {
+      throw new NotFoundException(`Book with id ${id} not found`);
+    }
+    return book;
   }
 
   @Delete(':id')
